@@ -12,7 +12,7 @@ from wsgiref.handlers import format_date_time
 
 import aiohttp
 from . import errors, hdrs
-from .multidict import CIMultiDict
+from .multidict import CIMultiDict, upstr
 from .log import internal_logger
 
 __all__ = ('HttpMessage', 'Request', 'Response',
@@ -585,7 +585,7 @@ class HttpMessage:
             'Header {!r} should have string value, got {!r}'.format(
                 name, value)
 
-        name = name.strip().upper()
+        name = upstr(name)
         value = value.strip()
 
         if name == hdrs.CONTENT_LENGTH:
@@ -811,8 +811,8 @@ class Response(HttpMessage):
     HOP_HEADERS = ()
 
     @staticmethod
-    def calc_reason(status):
-        record = RESPONSES.get(status)
+    def calc_reason(status, *, _RESPONSES=RESPONSES):
+        record = _RESPONSES.get(status)
         if record is not None:
             reason = record[0]
         else:
